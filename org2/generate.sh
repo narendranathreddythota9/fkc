@@ -84,9 +84,9 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "### Generating channel configuration transaction 'private.tx' ###"
+  echo "### Generating channel configuration transaction 'private1.tx' ###"
   echo "#################################################################"
-  configtxgen -profile TwoOrgsChannel -outputCreateChannelTx ./channel-artifacts/private.tx -channelID private
+  configtxgen -profile TwoOrgsChannel1 -outputCreateChannelTx ./channel-artifacts/private1.tx -channelID private1
   if [ "$?" -ne 0 ]; then
     echo "Failed to generate channel configuration transaction..."
     exit 1
@@ -94,17 +94,7 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org1MSP - public   ##########"
-  echo "#################################################################"
-  configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID public -asOrg Org1MSP
-  if [ "$?" -ne 0 ]; then
-    echo "Failed to generate anchor peer update for Org1MSP..."
-    exit 1
-  fi
-
-  echo
-  echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org2MSP - public  ##########"
+  echo "#######    Generating anchor peer update for Org2MSP - public   ##########"
   echo "#################################################################"
   configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID public -asOrg Org2MSP
   if [ "$?" -ne 0 ]; then
@@ -112,35 +102,17 @@ function generateChannelArtifacts() {
     exit 1
   fi
 
+
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org3MSP - public  ##########"
+  echo "#######    Generating anchor peer update for Org2MSP - private1  ##########"
   echo "#################################################################"
-  configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID public -asOrg Org3MSP
+  configtxgen -profile TwoOrgsChannel1 -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID private1 -asOrg Org2MSP
   if [ "$?" -ne 0 ]; then
     echo "Failed to generate anchor peer update for Org1MSP..."
     exit 1
   fi
 
-  echo
-  echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org1MSP - private   ##########"
-  echo "#################################################################"
-  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID private -asOrg Org1MSP
-  if [ "$?" -ne 0 ]; then
-    echo "Failed to generate anchor peer update for Org1MSP..."
-    exit 1
-  fi
-
-  echo
-  echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org2MSP - private  ##########"
-  echo "#################################################################"
-  configtxgen -profile TwoOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID private -asOrg Org2MSP
-  if [ "$?" -ne 0 ]; then
-    echo "Failed to generate anchor peer update for Org2MSP..."
-    exit 1
-  fi
   echo
 }
 
@@ -160,7 +132,7 @@ function replacePrivateKey () {
   # The next steps will replace the template's contents with the
   # actual values of the private key file names for the two CAs.
   CURRENT_DIR=$PWD
-  cd crypto-config/peerOrganizations/org2.example.com/ca/
+  cd crypto-config/peerOrganizations/org2/ca/
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR"
   sed $OPTS "s/CA2_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-kafka.yaml
@@ -181,7 +153,7 @@ function networkUp () {
       echo "#################################################################"
       echo "#######    Starting the network  ##########"
       echo "#################################################################"
-      docker-compose -f docker-compose-kafka.yaml -f docker-compose-couch.yaml up -d 2>&1
+      docker stack deploy --compose-file=docker-compose-kafka.yaml org2
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Unable to start network"
     exit 1

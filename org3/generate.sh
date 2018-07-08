@@ -84,13 +84,35 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "#######    Generating anchor peer update for Org3MSP - public  ##########"
+  echo "### Generating channel configuration transaction 'private1.tx' ###"
+  echo "#################################################################"
+  configtxgen -profile TwoOrgsChannel2 -outputCreateChannelTx ./channel-artifacts/private2.tx -channelID private2
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate channel configuration transaction..."
+    exit 1
+  fi
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org3MSP - public   ##########"
   echo "#################################################################"
   configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID public -asOrg Org3MSP
   if [ "$?" -ne 0 ]; then
-    echo "Failed to generate anchor peer update for Org1MSP..."
+    echo "Failed to generate anchor peer update for org3MSP..."
     exit 1
   fi
+
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org3MSP - private2  ##########"
+  echo "#################################################################"
+  configtxgen -profile TwoOrgsChannel2 -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID private2 -asOrg Org3MSP
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate anchor peer update for org3MSP..."
+    exit 1
+  fi
+
   echo
 }
 
@@ -110,7 +132,7 @@ function replacePrivateKey () {
   # The next steps will replace the template's contents with the
   # actual values of the private key file names for the two CAs.
   CURRENT_DIR=$PWD
-  cd crypto-config/peerOrganizations/org3.example.com/ca/
+  cd crypto-config/peerOrganizations/org3/ca/
   PRIV_KEY=$(ls *_sk)
   cd "$CURRENT_DIR"
   sed $OPTS "s/CA3_PRIVATE_KEY/${PRIV_KEY}/g" docker-compose-kafka.yaml
@@ -131,7 +153,7 @@ function networkUp () {
       echo "#################################################################"
       echo "#######    Starting the network  ##########"
       echo "#################################################################"
-      docker-compose -f docker-compose-kafka.yaml -f docker-compose-couch.yaml up -d 2>&1
+      docker stack deploy --compose-file=docker-compose-kafka.yaml org3
   if [ $? -ne 0 ]; then
     echo "ERROR !!!! Unable to start network"
     exit 1
@@ -141,7 +163,7 @@ function networkDown () {
   echo "#################################################################"
   echo "#######    Stopping Docker containers  ##########"
   echo "#################################################################"
-  docker-compose -f docker-compose-kafka.yaml -f docker-compose-couch.yaml down
+  docker-compose -f docker-compose-kafka.yaml down
   echo "#################################################################"
   echo "#######    Clearing Docker containers  ##########"
   echo "#################################################################"
