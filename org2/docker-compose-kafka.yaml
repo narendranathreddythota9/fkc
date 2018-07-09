@@ -11,19 +11,25 @@ services:
     image: hyperledger/fabric-ca
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca_org2
+      - FABRIC_CA_SERVER_CA_NAME=ca-org2
       - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca_org2-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/90322c8525317431be4b31107640ece75b294ff823299df9584150aaa36f5fc1_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org2-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/84554f13e8dcc25ec5a3e83d5f926be45ef6a73e702e80410f9415adb5d55633_sk
     ports:
       - "8054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca_org2-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/90322c8525317431be4b31107640ece75b294ff823299df9584150aaa36f5fc1_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org2-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/84554f13e8dcc25ec5a3e83d5f926be45ef6a73e702e80410f9415adb5d55633_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org2/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerOrg2
+    hostname: ca.org2
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
       - nath
 
@@ -48,23 +54,25 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer1.orderer/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer1.orderer/tls/:/var/hyperledger/orderer/tls
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer1.orderer/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer1.orderer/tls/:/var/hyperledger/orderer/tls
     ports:
       - 8050:8050
-    container_name: orderer1
-    hostname: orderer1
+    hostname: orderer1.orderer
     depends_on:
       - kafka0
       - kafka1
       - kafka2
-      - kafka3
-      - kafka4
-      - kafka5
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
       - nath
 
@@ -80,20 +88,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "7984:5984"
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer0_org2:
-    container_name: peer0_org2
+    hostname: peer0.org2
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer0_org2
-      - CORE_PEER_ADDRESS=peer0_org2:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1_org2:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0_org2:7051
+      - CORE_PEER_ID=peer0.org2
+      - CORE_PEER_ADDRESS=peer0.org2:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org2:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org2:7051
       - CORE_PEER_LOCALMSPID=Org2MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -122,16 +136,22 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org2/peers/peer0.org2/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org2/peers/peer0.org2/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org2/peers/peer0.org2/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org2/peers/peer0.org2/tls:/etc/hyperledger/fabric/tls
     ports:
         - 9051:7051
         - 9053:7053
     depends_on:
       - couchdb2
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -147,20 +167,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "8984:5984"
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer1_org2:
-    container_name: peer1_org2
+    hostname: peer1.org2
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer1_org2
-      - CORE_PEER_ADDRESS=peer1_org2:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1_org2:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0_org2:7051
+      - CORE_PEER_ID=peer1.org2
+      - CORE_PEER_ADDRESS=peer1.org2:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org2:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org2:7051
       - CORE_PEER_LOCALMSPID=Org2MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -189,15 +215,21 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org2/peers/peer1.org2/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org2/peers/peer1.org2/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org2/peers/peer1.org2/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org2/peers/peer1.org2/tls:/etc/hyperledger/fabric/tls
     ports:
       - 10051:7051
       - 10053:7053
     depends_on:
       - couchdb3
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-0-95]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath

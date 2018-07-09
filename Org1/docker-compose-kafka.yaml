@@ -15,62 +15,28 @@ services:
     image: hyperledger/fabric-ca
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca_org1
+      - FABRIC_CA_SERVER_CA_NAME=ca-org1
       - FABRIC_CA_SERVER_TLS_ENABLED=true
-      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca_org1-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/8f6b8c1729e72f0f5fb58bde5e415601c444c87ec029069ee1ec86ab0f5049dc_sk
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org1-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/98c9c4d0cde97200fc023e6d4efce3c686928ab36e6df26bf2c5d41aee9d9ad4_sk
     ports:
       - "7054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca_org1-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/8f6b8c1729e72f0f5fb58bde5e415601c444c87ec029069ee1ec86ab0f5049dc_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org1-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/98c9c4d0cde97200fc023e6d4efce3c686928ab36e6df26bf2c5d41aee9d9ad4_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org1/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerOrg1
+    hostname: ca.org1
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
-    - nath
+      - nath
 
-  orderer0:
-    image: hyperledger/fabric-orderer
-    environment:
-      - ORDERER_GENERAL_LOGLEVEL=debug
-      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
-      - ORDERER_GENERAL_GENESISMETHOD=file
-      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
-      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
-      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
-      # enabled TLS
-      - ORDERER_GENERAL_TLS_ENABLED=true
-      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
-      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
-      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
-      # kafka
-      - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
-      - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
-      - ORDERER_KAFKA_VERBOSE=true
-    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
-    ports:
-      - 7050:7050
-    command: orderer
-    volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/tls/:/var/hyperledger/orderer/tls
-    container_name: orderer0
-    hostname: orderer0
-    depends_on:
-      - kafka0
-      - kafka1
-      - kafka2
-      - kafka3
-      - kafka4
-      - kafka5
-    deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
-    networks:
-    - nath
 
   couchdb0:
     container_name: couchdb0
@@ -84,20 +50,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "5984:5984"
+    #deploy:
+    #  placement:
+    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer0_org1:
-    container_name: peer0_org1
+    hostname: peer0.org1
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer0_org1
-      - CORE_PEER_ADDRESS=peer0_org1:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1_org1:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0_org1:7051
+      - CORE_PEER_ID=peer0.org1
+      - CORE_PEER_ADDRESS=peer0.org1:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org1:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org1:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -126,16 +98,22 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org1/peers/peer0.org1/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org1/peers/peer0.org1/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org1/peers/peer0.org1/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org1/peers/peer0.org1/tls:/etc/hyperledger/fabric/tls
     ports:
       - 7051:7051
       - 7053:7053
     depends_on:
       - couchdb0
+    #deploy:
+    #  placement:
+    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -151,20 +129,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "6984:5984"
+    #deploy:
+    #  placement:
+    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer1_org1:
-    container_name: peer1_org1
+    hostname: peer1.org1
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer1_org1
-      - CORE_PEER_ADDRESS=peer1_org1:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1_org1:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0_org1:7051
+      - CORE_PEER_ID=peer1.org1
+      - CORE_PEER_ADDRESS=peer1.org1:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org1:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org1:7051
       - CORE_PEER_LOCALMSPID=Org1MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -193,16 +177,22 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org1/peers/peer1.org1/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org1/peers/peer1.org1/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org1/peers/peer1.org1/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org1/peers/peer1.org1/tls:/etc/hyperledger/fabric/tls
     ports:
       - 8051:7051
       - 8053:7053
     depends_on:
       - couchdb1
+    #deploy:
+    #  placement:
+    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-3-2]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -214,10 +204,12 @@ services:
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
       - ZOO_MY_ID=1
     restart: always
-    ports:
-      - 2181:2181
-      - 2888:2888
-      - 3888:3888
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -229,10 +221,12 @@ services:
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
       - ZOO_MY_ID=2
     restart: always
-    ports:
-      - 12181:2181
-      - 12888:2888
-      - 13888:3888
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -244,10 +238,12 @@ services:
       - ZOO_SERVERS=server.1=zookeeper0:2888:3888 server.2=zookeeper1:2888:3888 server.3=zookeeper2:2888:3888
       - ZOO_MY_ID=3
     restart: always
-    ports:
-      - 22181:2181
-      - 22888:2888
-      - 23888:3888
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -271,6 +267,12 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -294,6 +296,12 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
@@ -317,74 +325,54 @@ services:
       - zookeeper0
       - zookeeper1
       - zookeeper2
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
-  kafka3:
-    container_name: kafka3
-    hostname: kafka3
-    image: hyperledger/fabric-kafka
-    restart: always
+  orderer0:
+    image: hyperledger/fabric-orderer
     environment:
-      - KAFKA_MESSAGE_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
-      - KAFKA_MIN_INSYNC_REPLICAS=2
-      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-      - KAFKA_BROKER_ID=3
+      - ORDERER_GENERAL_LOGLEVEL=debug
+      - ORDERER_GENERAL_LISTENADDRESS=0.0.0.0
+      - ORDERER_GENERAL_GENESISMETHOD=file
+      - ORDERER_GENERAL_GENESISFILE=/var/hyperledger/orderer/orderer.genesis.block
+      - ORDERER_GENERAL_LOCALMSPID=OrdererMSP
+      - ORDERER_GENERAL_LOCALMSPDIR=/var/hyperledger/orderer/msp
+      # enabled TLS
+      - ORDERER_GENERAL_TLS_ENABLED=true
+      - ORDERER_GENERAL_TLS_PRIVATEKEY=/var/hyperledger/orderer/tls/server.key
+      - ORDERER_GENERAL_TLS_CERTIFICATE=/var/hyperledger/orderer/tls/server.crt
+      - ORDERER_GENERAL_TLS_ROOTCAS=[/var/hyperledger/orderer/tls/ca.crt]
+      # kafka
+      - ORDERER_KAFKA_RETRY_SHORTINTERVAL=1s
+      - ORDERER_KAFKA_RETRY_SHORTTOTAL=30s
+      - ORDERER_KAFKA_VERBOSE=true
+    working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     ports:
-      - 12092:9092
-      - 12093:9093
+      - 7050:7050
+    command: orderer
+    volumes:
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/tls/:/var/hyperledger/orderer/tls
+    hostname: orderer0.orderer
+    deploy:
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
-    networks:
-    - nath
-
-  kafka4:
-    container_name: kafka4
-    hostname: kafka4
-    image: hyperledger/fabric-kafka
-    restart: always
-    environment:
-      - KAFKA_MESSAGE_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
-      - KAFKA_MIN_INSYNC_REPLICAS=2
-      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-      - KAFKA_BROKER_ID=2
-    ports:
-      - 13092:9092
-      - 13093:9093
-    depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
-    networks:
-    - nath
-
-  kafka5:
-    container_name: kafka5
-    hostname: kafka5
-    image: hyperledger/fabric-kafka
-    restart: always
-    environment:
-      - KAFKA_MESSAGE_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_REPLICA_FETCH_MAX_BYTES=103809024 # 99 * 1024 * 1024 B
-      - KAFKA_UNCLEAN_LEADER_ELECTION_ENABLE=false
-      - KAFKA_MIN_INSYNC_REPLICAS=2
-      - KAFKA_DEFAULT_REPLICATION_FACTOR=3
-      - KAFKA_ZOOKEEPER_CONNECT=zookeeper0:2181,zookeeper1:2181,zookeeper2:2181
-      - KAFKA_BROKER_ID=3
-    ports:
-      - 14092:9092
-      - 14093:9093
-    depends_on:
-      - zookeeper0
-      - zookeeper1
-      - zookeeper2
+      - kafka0
+      - kafka1
+      - kafka2
+    #deploy:
+      #placement:
+        #constraints: [node.hostname==ip-172-31-3-2]
     networks:
     - nath

@@ -15,19 +15,25 @@ services:
     image: hyperledger/fabric-ca
     environment:
       - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
-      - FABRIC_CA_SERVER_CA_NAME=ca_org3
+      - FABRIC_CA_SERVER_CA_NAME=ca-org3
       - FABRIC_CA_SERVER_TLS_ENABLED=true
       - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.org3-cert.pem
-      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/5a5bfa5c34b66cba04b45c052d0132cd8ca5a45b98951634893a6a006b7e630d_sk
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/488a8ca4613cd61940e17cec6d5fdb1891abcc22512617975222fe4f1ab1bd37_sk
     ports:
       - "9054:7054"
-    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org3-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/5a5bfa5c34b66cba04b45c052d0132cd8ca5a45b98951634893a6a006b7e630d_sk -b admin:adminpw -d'
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.org3-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/488a8ca4613cd61940e17cec6d5fdb1891abcc22512617975222fe4f1ab1bd37_sk -b admin:adminpw -d'
     volumes:
       - ./crypto-config/peerOrganizations/org3/ca/:/etc/hyperledger/fabric-ca-server-config
-    container_name: ca_peerOrg3
+    hostname: ca.org3
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
       - nath
 
@@ -52,28 +58,30 @@ services:
     working_dir: /opt/gopath/src/github.com/hyperledger/fabric
     command: orderer
     volumes:
-      - ../channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer2.orderer/msp:/var/hyperledger/orderer/msp
-      - ../crypto-config/ordererOrganizations/orderer/orderers/orderer2.orderer/tls/:/var/hyperledger/orderer/tls
+      - ./channel-artifacts/genesis.block:/var/hyperledger/orderer/orderer.genesis.block
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer2.orderer/msp:/var/hyperledger/orderer/msp
+      - ./crypto-config/ordererOrganizations/orderer/orderers/orderer2.orderer/tls/:/var/hyperledger/orderer/tls
     ports:
       - 9050:8050
-    container_name: orderer1
-    hostname: orderer1
+    hostname: orderer2.orderer
     depends_on:
       - kafka0
       - kafka1
       - kafka2
-      - kafka3
-      - kafka4
-      - kafka5
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
       - nath
 
-  couchdb0:
-    container_name: couchdb0
+  couchdb4:
+    container_name: couchdb4
     image: hyperledger/fabric-couchdb
     # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
     # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
@@ -84,20 +92,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "9984:5984"
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer0_org3:
-    container_name: peer0_org3
+    hostname: peer0.org3
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer0_org3
-      - CORE_PEER_ADDRESS=peer0_org3:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1_org3:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0_org3:7051
+      - CORE_PEER_ID=peer0.org3
+      - CORE_PEER_ADDRESS=peer0.org3:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer1.org3:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer0.org3:7051
       - CORE_PEER_LOCALMSPID=Org3MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -116,7 +130,7 @@ services:
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # -- About Couchdb  --
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb0:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb4:5984
       # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
       # provide the credentials for ledger to connect to CouchDB.  The username and password must
       # match the username and password set for the associated CouchDB.
@@ -126,21 +140,27 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org3/peers/peer0.org3/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org3/peers/peer0.org3/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org3/peers/peer0.org3/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org3/peers/peer0.org3/tls:/etc/hyperledger/fabric/tls
     ports:
         - 11051:7051
         - 11053:7053
     depends_on:
-      - couchdb0
+      - couchdb4
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
-  couchdb1:
-    container_name: couchdb1
+  couchdb5:
+    container_name: couchdb5
     image: hyperledger/fabric-couchdb
     # Populate the COUCHDB_USER and COUCHDB_PASSWORD to set an admin user and password
     # for CouchDB.  This will prevent CouchDB from operating in an "Admin Party" mode.
@@ -151,20 +171,26 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "10984:5984"
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath
 
   peer1_org3:
-    container_name: peer1_org3
+    hostname: peer1.org3
     image: hyperledger/fabric-peer
     environment:
-      - CORE_PEER_ID=peer1_org3
-      - CORE_PEER_ADDRESS=peer1_org3:7051
-      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1_org3:7051
-      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0_org3:7051
+      - CORE_PEER_ID=peer1.org3
+      - CORE_PEER_ADDRESS=peer1.org3:7051
+      - CORE_PEER_GOSSIP_EXTERNALENDPOINT=peer1.org3:7051
+      - CORE_PEER_GOSSIP_BOOTSTRAP=peer0.org3:7051
       - CORE_PEER_LOCALMSPID=Org3MSP
       # -- Common --
       - CORE_VM_ENDPOINT=unix:///host/var/run/docker.sock
@@ -183,7 +209,7 @@ services:
       - CORE_PEER_TLS_ROOTCERT_FILE=/etc/hyperledger/fabric/tls/ca.crt
       # -- About Couch --
       - CORE_LEDGER_STATE_STATEDATABASE=CouchDB
-      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb1:5984
+      - CORE_LEDGER_STATE_COUCHDBCONFIG_COUCHDBADDRESS=couchdb5:5984
       # The CORE_LEDGER_STATE_COUCHDBCONFIG_USERNAME and CORE_LEDGER_STATE_COUCHDBCONFIG_PASSWORD
       # provide the credentials for ledger to connect to CouchDB.  The username and password must
       # match the username and password set for the associated CouchDB.
@@ -193,15 +219,21 @@ services:
     command: peer node start
     volumes:
         - /var/run/:/host/var/run/
-        - ../crypto-config/peerOrganizations/org3/peers/peer1.org3/msp:/etc/hyperledger/fabric/msp
-        - ../crypto-config/peerOrganizations/org3/peers/peer1.org3/tls:/etc/hyperledger/fabric/tls
+        - ./crypto-config/peerOrganizations/org3/peers/peer1.org3/msp:/etc/hyperledger/fabric/msp
+        - ./crypto-config/peerOrganizations/org3/peers/peer1.org3/tls:/etc/hyperledger/fabric/tls
     ports:
       - 12051:7051
       - 12053:7053
     depends_on:
-      - couchdb1
+      - couchdb5
+    # deploy:
+      # placement:
+        # constraints: [node.hostname==ip-172-31-12-49]
     deploy:
-      placement:
-        constraints: [node.hostname==ip-172-31-12-49]
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
     networks:
     - nath

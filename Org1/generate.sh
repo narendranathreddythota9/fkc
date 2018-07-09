@@ -112,6 +112,25 @@ function generateChannelArtifacts() {
     exit 1
   fi
 
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org2MSP - public   ##########"
+  echo "#################################################################"
+  configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID public -asOrg Org2MSP
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org2MSP..."
+    exit 1
+  fi
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org3MSP - public   ##########"
+  echo "#################################################################"
+  configtxgen -profile ThreeOrgsChannel -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID public -asOrg Org3MSP
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org3MSP..."
+    exit 1
+  fi
 
   echo
   echo "#################################################################"
@@ -125,6 +144,17 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org2MSP - private1  ##########"
+  echo "#################################################################"
+  configtxgen -profile TwoOrgsChannel1 -outputAnchorPeersUpdate ./channel-artifacts/Org2MSPanchors.tx -channelID private1 -asOrg Org2MSP
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate anchor peer update for Org2MSP..."
+    exit 1
+  fi
+
+
+  echo
+  echo "#################################################################"
   echo "#######    Generating anchor peer update for Org1MSP - private2  ##########"
   echo "#################################################################"
   configtxgen -profile TwoOrgsChannel2 -outputAnchorPeersUpdate ./channel-artifacts/Org1MSPanchors.tx -channelID private2 -asOrg Org1MSP
@@ -132,6 +162,18 @@ function generateChannelArtifacts() {
     echo "Failed to generate anchor peer update for org1MSP..."
     exit 1
   fi
+
+
+  echo
+  echo "#################################################################"
+  echo "#######    Generating anchor peer update for Org3MSP - private2  ##########"
+  echo "#################################################################"
+  configtxgen -profile TwoOrgsChannel2 -outputAnchorPeersUpdate ./channel-artifacts/Org3MSPanchors.tx -channelID private2 -asOrg Org3MSP
+  if [ "$?" -ne 0 ]; then
+    echo "Failed to generate anchor peer update for org3MSP..."
+    exit 1
+  fi
+
   echo
 }
 

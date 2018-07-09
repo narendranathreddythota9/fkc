@@ -44,11 +44,13 @@ channels:
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer0
+      - orderer0.orderer
+      - orderer1.orderer
+      - orderer2.orderer
 
     # Required. list of peers from participating orgs
     peers:
-      peer0_org1:
+      peer0.org1:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -68,19 +70,19 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1_org1:
+      peer1.org1:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: false
 
-      peer0_org2:
+      peer0.org2:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer1_org2:
+      peer1.org2:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
@@ -93,11 +95,13 @@ channels:
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer0
+      - orderer0.orderer
+      - orderer1.orderer
+      - orderer2.orderer
 
     # Required. list of peers from participating orgs
     peers:
-      peer0_org1:
+      peer0.org1:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -117,19 +121,19 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1_org1:
+      peer1.org1:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: false
 
-      peer0_org3:
+      peer0.org3:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer1_org3:
+      peer1.org3:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
@@ -142,12 +146,14 @@ channels:
     # operational decisions to share loads from applications among the orderers.  The values must
     # be "names" of orgs defined under "organizations/peers"
     orderers:
-      - orderer0
+      - orderer0.orderer
+      - orderer1.orderer
+      - orderer2.orderer
 
 
     # Required. list of peers from participating orgs
     peers:
-      peer0_org1:
+      peer0.org1:
         # [Optional]. will this peer be sent transaction proposals for endorsement? The peer must
         # have the chaincode installed. The app can also use this property to decide which peers
         # to send the chaincode install request. Default: true
@@ -167,31 +173,31 @@ channels:
         # Default: true
         eventSource: true
 
-      peer1_org1:
+      peer1.org1:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: false
 
-      peer0_org2:
+      peer0.org2:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer1_org2:
+      peer1.org2:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: false
 
-      peer0_org3:
+      peer0.org3:
         endorsingPeer: true
         chaincodeQuery: true
         ledgerQuery: true
         eventSource: true
 
-      peer1_org3:
+      peer1.org3:
         endorsingPeer: false
         chaincodeQuery: true
         ledgerQuery: true
@@ -214,8 +220,8 @@ organizations:
     mspid: Org1MSP
 
     peers:
-      - peer0_org1
-      - peer1_org1
+      - peer0.org1
+      - peer1.org1
 
     # [Optional]. Certificate Authorities issue certificates for identification purposes in a Fabric based
     # network. Typically certificates provisioning is done in a separate process outside of the
@@ -223,7 +229,7 @@ organizations:
     # dynamic certificate management (enroll, revoke, re-enroll). The following section is only for
     # Fabric-CA servers.
     certificateAuthorities:
-      - ca_org1
+      - ca-org1
 
     # [Optional]. If the application is going to make requests that are reserved to organization
     # administrators, including creating/updating channels, installing/instantiating chaincodes, it
@@ -233,7 +239,7 @@ organizations:
     # this way. The SDK should allow applications to set the org admin identity via APIs, and only use
     # this route as an alternative when it exists.
     adminPrivateKey:
-      path: crypto-config/peerOrganizations/org1/users/Admin@org1/msp/keystore/fc1f819fcccfb02ff5176a0ec0d405ada58a8a4351e2abeb63acc7fc1a5bb9e8_sk
+      path: crypto-config/peerOrganizations/org1/users/Admin@org1/msp/keystore/e1f605990e5bb3920d1f755b674ea62a2e7df58d1ecc65526783e76f261da501_sk
     signedCert:
       path: crypto-config/peerOrganizations/org1/users/Admin@org1/msp/signcerts/Admin@org1-cert.pem
 
@@ -249,24 +255,48 @@ organizations:
 # SDK is implementation specific. Consult each SDK's documentation for its handling of orderers.
 #
 orderers:
-  orderer0:
+  orderer0.orderer:
     url: grpcs://localhost:7050
 
     # these are standard properties defined by the gRPC library
     # they will be passed in as-is to gRPC client constructor
     grpcOptions:
-      ssl-target-name-override: orderer0
+      ssl-target-name-override: orderer0.orderer
       grpc-max-send-message-length: 15
 
     tlsCACerts:
       path: crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/tls/ca.crt
+
+  orderer1.orderer:
+    url: grpcs://localhost:8050
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer1.orderer
+      grpc-max-send-message-length: 15
+
+    tlsCACerts:
+      path: crypto-config/ordererOrganizations/orderer/orderers/orderer1.orderer/tls/ca.crt
+
+  orderer2.orderer:
+    url: grpcs://localhost:9050
+
+    # these are standard properties defined by the gRPC library
+    # they will be passed in as-is to gRPC client constructor
+    grpcOptions:
+      ssl-target-name-override: orderer2.orderer
+      grpc-max-send-message-length: 15
+
+    tlsCACerts:
+      path: crypto-config/ordererOrganizations/orderer/orderers/orderer2.orderer/tls/ca.crt
 
 #
 # List of peers to send various requests to, including endorsement, query
 # and event listener registration.
 #
 peers:
-  peer0_org1:
+  peer0.org1:
     # this URL is used to send endorsement and query requests
     url: grpcs://localhost:7051
 
@@ -274,15 +304,15 @@ peers:
     eventUrl: grpcs://localhost:7053
 
     grpcOptions:
-      ssl-target-name-override: peer0_org1
+      ssl-target-name-override: peer0.org1
     tlsCACerts:
       path: crypto-config/peerOrganizations/org1/peers/peer0.org1/tls/ca.crt
 
-  peer1_org1:
+  peer1.org1:
     url: grpcs://localhost:8051
     eventUrl: grpcs://localhost:8053
     grpcOptions:
-      ssl-target-name-override: peer1_org1
+      ssl-target-name-override: peer1.org1
     tlsCACerts:
       path: crypto-config/peerOrganizations/org1/peers/peer1.org1/tls/ca.crt
 
@@ -293,7 +323,7 @@ peers:
 # Certificate Authority instead of Fabric-CA, in which case this section would not be specified.
 #
 certificateAuthorities:
-  ca_org1:
+  ca-org1:
     url: https://localhost:7054
     # the properties specified under this object are passed to the 'http' client verbatim when
     # making the request to the Fabric-CA server
@@ -308,4 +338,4 @@ certificateAuthorities:
       - enrollId: admin
         enrollSecret: adminpw
     # [Optional] The optional name of the CA.
-    caName: ca_org1
+    caName: ca-org1

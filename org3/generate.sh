@@ -84,7 +84,7 @@ function generateChannelArtifacts() {
 
   echo
   echo "#################################################################"
-  echo "### Generating channel configuration transaction 'private1.tx' ###"
+  echo "### Generating channel configuration transaction 'private2.tx' ###"
   echo "#################################################################"
   configtxgen -profile TwoOrgsChannel2 -outputCreateChannelTx ./channel-artifacts/private2.tx -channelID private2
   if [ "$?" -ne 0 ]; then
