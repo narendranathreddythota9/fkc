@@ -25,10 +25,9 @@ services:
     volumes:
       - ./crypto-config/peerOrganizations/org1/ca/:/etc/hyperledger/fabric-ca-server-config
     hostname: ca.org1
-    # deploy:
-      # placement:
-        # constraints: [node.hostname==ip-172-31-0-95]
     deploy:
+    # placement:
+      # constraints: [node.hostname==ip-172-31-0-95]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -50,10 +49,9 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "5984:5984"
-    #deploy:
-    #  placement:
-    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
+    # placement:
+    #   constraints: [node.hostname==ip-172-31-3-2]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -105,10 +103,9 @@ services:
       - 7053:7053
     depends_on:
       - couchdb0
-    #deploy:
-    #  placement:
-    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
+    # placement:
+    #   constraints: [node.hostname==ip-172-31-3-2]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -129,10 +126,9 @@ services:
     # for example map it to utilize Fauxton User Interface in dev environments.
     ports:
       - "6984:5984"
-    #deploy:
-    #  placement:
-    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
+    # placement:
+    #   constraints: [node.hostname==ip-172-31-3-2]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -184,10 +180,9 @@ services:
       - 8053:7053
     depends_on:
       - couchdb1
-    #deploy:
-    #  placement:
-    #    constraints: [node.hostname==ip-172-31-3-2]
     deploy:
+    # placement:
+    #   constraints: [node.hostname==ip-172-31-3-2]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -362,6 +357,8 @@ services:
       - ./crypto-config/ordererOrganizations/orderer/orderers/orderer0.orderer/tls/:/var/hyperledger/orderer/tls
     hostname: orderer0.orderer
     deploy:
+    # placement:
+    #   constraints: [node.hostname==ip-172-31-3-2]
       replicas: 1
       restart_policy:
         condition: on-failure
@@ -371,8 +368,5 @@ services:
       - kafka0
       - kafka1
       - kafka2
-    #deploy:
-      #placement:
-        #constraints: [node.hostname==ip-172-31-3-2]
     networks:
     - nath

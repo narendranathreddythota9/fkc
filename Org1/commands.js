@@ -2,7 +2,7 @@
 
 
 //User Register
-curl -s -X POST http://18.191.198.83:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=Org1'
+curl -s -X POST http://18.222.168.197:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=Org2'
 
 
 //Create Cannel
@@ -17,11 +17,11 @@ curl -s -X POST \
 
 //Add Peers to Channel
 curl -s -X POST \
-  http://18.191.198.83:4000/channels/public/peers \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzExOTEwNzksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzExNTUwNzl9.tKqAm11eEZF4dzZr4XxNo_9__GExbC0b0ayeuCo57ck" \
+  http://18.222.168.197:4000/channels/public/peers \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzExOTI2MzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzIiLCJpYXQiOjE1MzExNTY2MzF9.ajwXs2XvrRVoeugcck45ljBmBeEx-tcOJhX0Asbiq28" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["peer0.org1","peer1.org1"]
+	"peers": ["peer0.org2","peer1.org2"]
 }'
 
 //Install Chain code on Private Channel

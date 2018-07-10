@@ -245,7 +245,7 @@ orderers:
 # and event listener registration.
 #
 peers:
-  peer0.0rg2:
+  peer0.org2:
     # this URL is used to send endorsement and query requests
     url: grpcs://localhost:9051
 
