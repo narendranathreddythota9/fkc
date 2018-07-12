@@ -2,32 +2,32 @@
 
 
 //User Register
-curl -s -X POST http://localhost:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=Org1'
+curl -s -X POST http://18.219.138.246:4000/users -H "content-type: application/x-www-form-urlencoded" -d 'username=Jim&orgName=Org3'
 
 
 //Create Cannel
 curl -s -X POST \
-  http://localhost:4000/channels \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"channelName":"channel1",
-	"channelConfigPath":"../artifacts/channel/channel1.tx"
+	"channelConfigPath":"../artifacts/channel/public.tx"
 }'
 
 //Add Peers to Channel
 curl -s -X POST \
-  http://localhost:4000/channels/channel1/peers \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/public/peers \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
-	"peers": ["peer0.org1.example.com","peer1.org1.example.com"]
+	"peers": ["peer0.org3","peer1.org3"]
 }'
 
 //Install Chain code on Private Channel
 curl -s -X POST \
-  http://localhost:4000/chaincodes \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/chaincodes \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -39,8 +39,8 @@ curl -s -X POST \
 
 // Instantiate chain code
 curl -s -X POST \
-  http://localhost:4000/channels/channel1/chaincodes \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel1/chaincodes \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -53,8 +53,8 @@ curl -s -X POST \
 
 // Invoke Chain Code createRate
 curl -s -X POST \
-  http://localhost:4000/channels/channel1/chaincodes/rate \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel1/chaincodes/rate \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -64,7 +64,7 @@ curl -s -X POST \
 
 //Oracle
 curl -X POST \
- http://localhost:5100/bcsgw/rest/v1/transaction/invocation \
+ http://18.219.138.246:5100/bcsgw/rest/v1/transaction/invocation \
 -H "Content-type:application/json" \
 -d ' {
   "channel": "innoprivate",
@@ -80,8 +80,8 @@ curl -X POST \
 
 //Query ChainCode
 curl -s -X POST \
-  http://localhost:4000/channels/channel1 \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel1 \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
   "chaincodeName":"rate",
@@ -98,8 +98,8 @@ curl -s -X POST \
 
 //Create Cannel
 curl -s -X POST \
-  http://localhost:4000/channels \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"channelName":"channel2",
@@ -108,8 +108,8 @@ curl -s -X POST \
 
 //Add Peers to Channel
 curl -s -X POST \
-  http://localhost:4000/channels/channel2/peers \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2/peers \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"]
@@ -117,8 +117,8 @@ curl -s -X POST \
 
 //Install Chain code on Public Channel
 curl -s -X POST \
-  http://localhost:4000/chaincodes \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/chaincodes \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -130,8 +130,8 @@ curl -s -X POST \
 
 // Instantiate chain code
 curl -s -X POST \
-  http://localhost:4000/channels/channel2/chaincodes \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2/chaincodes \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -144,8 +144,8 @@ curl -s -X POST \
 
 // Invoke Chain Code createRate
 curl -s -X POST \
-  http://localhost:4000/channels/channel2/chaincodes/vistexdev \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2/chaincodes/vistexdev \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -156,8 +156,8 @@ curl -s -X POST \
 
 // Invoke Chain Code updateRate
 curl -s -X POST \
-  http://localhost:4000/channels/channel2/chaincodes/vistex \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2/chaincodes/vistex \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
 	"peers": ["peer0.org1.example.com","peer1.org1.example.com"],
@@ -168,8 +168,8 @@ curl -s -X POST \
 
 //Query ChainCode
 curl -s -X POST \
-  http://localhost:4000/channels/channel2 \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2 \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
   "chaincodeName":"vistexdev",
@@ -179,8 +179,8 @@ curl -s -X POST \
 }'
 
 curl -s -X POST \
-  http://localhost:4000/channels/channel2 \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+  http://18.219.138.246:4000/channels/channel2 \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json" \
   -d '{
   "chaincodeName":"general",
@@ -190,22 +190,22 @@ curl -s -X POST \
 }'
 
 
-curl -s -X GET http://localhost:4000/channels/channel2/transactions/d9607b4e5365ab3ab7da43a72834aec04422795862011dee0771ae469ad6fbdd?peer=peer0.org1.example.com \
-  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzA2MzI0NzEsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1MzA1OTY0NzF9.Qrq0r_5jMGHzsiXwwhVJpzcsfGZxZqNEMuvw8FJt4bQ" \
+curl -s -X GET http://18.219.138.246:4000/channels/channel2/transactions/d9607b4e5365ab3ab7da43a72834aec04422795862011dee0771ae469ad6fbdd?peer=peer0.org1.example.com \
+  -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MzEzNDgxOTksInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzMiLCJpYXQiOjE1MzEzMTIxOTl9.E0yBrxYuNf0yJ0560u4EPM_w7XxnZkhloBtIayZd1MM" \
   -H "content-type: application/json"
 
 
   curl -s -X GET \
-  "http://localhost:4000/channels/private/blocks/1?peer=peer0.org1.example.com" \
+  "http://18.219.138.246:4000/channels/private/blocks/1?peer=peer0.org1.example.com" \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Mjg4MjI5MjUsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1Mjg3ODY5MjV9.bzlxN1fLv8i_7hvkBtzCb8odo99RZmT3v5QKAdNZ4cc" \
   -H "content-type: application/json"
 
   curl -s -X GET \
-  "http://localhost:4000/channels?peer=peer0.org1.example.com" \
+  "http://18.219.138.246:4000/channels?peer=peer0.org1.example.com" \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Mjg4MjI5MjUsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1Mjg3ODY5MjV9.bzlxN1fLv8i_7hvkBtzCb8odo99RZmT3v5QKAdNZ4cc" \
   -H "content-type: application/json"
 
   curl -s -X GET \
-  "http://localhost:4000/channels/private?peer=peer0.org1.example.com" \
+  "http://18.219.138.246:4000/channels/private?peer=peer0.org1.example.com" \
   -H "authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1Mjg4MjI5MjUsInVzZXJuYW1lIjoiSmltIiwib3JnTmFtZSI6Ik9yZzEiLCJpYXQiOjE1Mjg3ODY5MjV9.bzlxN1fLv8i_7hvkBtzCb8odo99RZmT3v5QKAdNZ4cc" \
   -H "content-type: application/json"

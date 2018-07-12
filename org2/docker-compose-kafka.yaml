@@ -65,7 +65,9 @@ services:
       - kafka2
     deploy:
     # placement:
-    #   constraints: [node.hostname==ip-172-31-3-2]
+    #   constraints:
+    #     - node.hostname == ip-172-31-3-2
+    #     - node.role == manager
       replicas: 1
       restart_policy:
         condition: on-failure
